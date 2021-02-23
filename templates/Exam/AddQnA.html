@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}OES | Add QnA{% endblock title %}
+{% load crispy_forms_tags %}
+{% block body %}
+{% include 'Exam/Nav.html'%}
+<div class="container mt-4">
+<h1>Add Questions for Quiz</h1>
+ <form method="POST"> 
+    <!-- Management data of formset -->
+    <!-- Security token -->
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-4">
+            {{quesform|crispy}}
+        </div>
+        <div class="col-4">
+            {% for form in ansform %}
+            {{form|crispy}}
+            {% endfor %}
+        </div>
+        <div class="col-4">
+            {% if field.has_errors%}
+                <h3>ERROR</h3>
+            {% endif %}
+        </div> 
+    </div>
+    <button type="submit" class="btn btn-primary">Save and add Next Question</button>
+    <a name="" id="" class="btn btn-danger" href="{% url 'qsubmit' %}" role="button">Submit Quiz</a>
+    </form>
+</div>
+{% endblock body %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} <table class="table">
+                <thead>
+                    {% for form in formset %}
+                        {% if forloop.first %}
+                            {% for field in form.visible_fields  %}
+                                <th>{{ field.label_tag}}</th>
+                        {% endfor %}
+                    {% endif %}
+                </thead>
+                    <tbody>
+                        <tr>
+                            {% for field in form.visible_fields %}
+                            <td scope="row">{{field}}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+            </table> {% endcomment %}

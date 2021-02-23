@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}OES | Unpublished Quiz{% endblock title %}
+{% block unpublish %}active{% endblock unpublish %}
+{% block body %}
+{% include 'Exam/Nav.html'%}
+<div class="container mt-4">
+    <h1>Un-published Quizes</h1>
+        {% comment %} <img src="{%url 'video' %}"> {% endcomment %}
+        <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Quiz Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizes %}
+                <tr>
+                    <td scope="row">{{quiz}}</td>
+                    <td>{{quiz.description}}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url 'publish' quiz.id %}" role="button">Publish Quiz</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock body %}

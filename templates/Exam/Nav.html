@@ -1,0 +1,32 @@
+ <!-- Start: Navigation with Button -->
+ {% load auth_extras %}
+    <nav class="navbar navbar-dark bg-dark navbar-expand-md navigation-clean-button">
+        <div class="container"><a class="navbar-brand" href="{% url 'home' %}">OES</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse"
+                id="navcol-1">
+                <ul class="nav navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link {% block active_quizes %}{% endblock active_quizes %}" href="{% url 'home' %}">Available Quizes</a></li>
+                    {% if request.user|has_group:"teacher" %}
+                        <li class="nav-item"><a class="nav-link {% block active_addquiz %}{% endblock active_addquiz %}" href="{% url 'addquiz' %}">Add Quiz</a></li>
+                        <li class="nav-item"><a class="nav-link {% block unpublish %}{% endblock unpublish %}" href="{% url 'unpublish' %}">Un-Published Quiz</a></li>
+                    {% endif %}
+                    {% if request.user.is_staff %}
+                    <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+                    {% endif %}
+                    
+                </ul>
+                {% if request.user.is_authenticated %}
+                    <span>
+                    <a class="btn btn-info rounded-pill" role="button" href="{% url 'profile' %}">{{request.user}} Profile</a>
+                    <a class="btn btn-danger rounded-pill" role="button" href="{% url 'logout' %}">Logout</a>
+                    </span>
+                
+                {% else %}
+                    <span class="navbar-text actions"> <a class="login" href="{% url 'login' %}">Log In</a>
+                    <a class="btn btn-info action-button" role="button" href="{% url 'signup' %}">Sign Up</a>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <!-- End: Navigation with Button -->

@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block title %}OES | Add Quiz{% endblock title %}
+{% load crispy_forms_tags %}
+{% block active_addquiz %}active{% endblock active_addquiz %} {% load
+crispy_forms_tags %} {% block body %}
+{% include 'Exam/Nav.html'%}
+<div class="container mt-4">
+<h1>Add Quiz</h1>
+  <div class="row">
+    <div class="col">
+    <form method="POST"> 
+      {% csrf_token %}
+      {{ quizform|crispy }}
+      <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock body %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}OES | Report{% endblock title %} {% block body %}
+{% load static %}
+<div class="container mt-4">
+    <div class="row">
+       <div class="col">
+        <img src="{% static 'img/sistec.png' %}" alt="" width="200px" height="50px">
+       </div>
+       <div class="col my-auto">
+           <h2>{{quiz}}</h2>
+       </div>
+    </div>
+    <table class="table mt-3">
+        <thead class="thead-light">
+            <tr>
+                <th>Name :</th>
+                <th>{{request.user.first_name}} {{request.user.last_name}}</th>
+                <th>Roll Number :</th>
+                <th>{{request.user.student.RollNo}}</th>
+                <th>Test Date : </th>
+                <th>{{quiz.created}}</th>
+            </tr>
+        </thead>
+    </table>
+    <div class="table-responsive">
+        <table class="table">
+                <thead class="thead-light">
+                <tr>
+                    <th class="text-center" scope="col">Question</th>
+                    <th class="text-center" scope="col">Your Answer</th>
+                    <th class="text-center" scope="col">Response</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for r in response %}
+                <tr>
+                    <td>{{r.question}}</td>
+                    <td class="text-center">{{r.answer}}</td>
+                    <td class="text-center">
+                    {% if r.answer.is_correct %}
+                        <i class="fa fa-check fa-lg" aria-hidden="true">Right</i>
+                    {% else %}
+                        <i class="fa fa-times fa-lg" aria-hidden="true">Wrong</i>
+                    {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+{% endblock body %}

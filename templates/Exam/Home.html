@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}OES | Home{% endblock title %}
+{% block active_quizes %}active{% endblock active_quizes %}
+{% block body %}
+{% load auth_extras %}
+{% include 'Exam/Nav.html'%}
+
+
+
+<div class="container mt-4">
+    <h1>Available Quizes</h1>
+        {% comment %} <img src="{%url 'video' %}"> {% endcomment %}
+        <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Quiz Name</th>
+                    <th>Description</th>
+                    <th>Creation Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizes %}
+                <tr>
+                    <td scope="row">{{quiz}}</td>
+                    <td>{{quiz.description}}</td>
+                    <td>{{quiz.created}}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url 'attemptquiz' quiz.slug %}" role="button">Attempt Quiz</a>
+                        {% if request.user|has_group:"teacher" %}
+                        <a class="btn btn-danger" href="{% url 'deletequiz' quiz.id %}" role="button">Delete Quiz</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock body %}

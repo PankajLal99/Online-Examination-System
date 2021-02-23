@@ -1,0 +1,92 @@
+{% extends "base.html" %} {% block title %}OES | {{request.user}} Profile{% endblock title %} {% block body %} {% load auth_extras %}
+{% include 'Exam/Nav.html'%}
+{% load auth_extras %}
+<div class="container mt-4">
+  <h2>Profile Page</h2>
+  <div class="table-responsive">
+    <table class="table mt-3">
+        <thead class="">
+            <tr>
+                <th>Name :</th>
+                <th>{{request.user.first_name}} {{request.user.last_name}}</th>
+                {% if request.user|has_group:"teacher" %}
+                <th>UID :</th>
+                <th>{{request.user.teacher.UID}}</th>
+                <th>Branch :</th>
+                <th>{{request.user.teacher.Branch}}</th>
+                <th>Semester :</th>
+                <th>{{request.user.teacher.Sem}}</th>
+                {% else %}
+                <th>Roll Number :</th>
+                <th>{{request.user.student.RollNo}}</th>
+                <th>Branch :</th>
+                <th>{{request.user.student.Branch}}</th>
+                <th>Semester :</th>
+                <th>{{request.user.student.Sem}}</th>
+                {% endif %}
+                <th></th>
+                <th>
+                    {% if request.user|has_group:"teacher" %}
+                    <a name="" id="" class="" href="{% url 'details_teach' %}" >Edit your details ?</a>
+                    {% else %}
+                    <a name="" id="" class="" href="{% url 'details_stud' %}" >Edit your details ?</a>
+                    {% endif %}
+                </th>
+            </tr>
+        </thead>
+    </table>
+      
+  </div>
+  {% if request.user|has_group:"teacher" %}
+  <div class="table-responsive">
+    <table class="table mt-2">
+            <thead class="thead-light">
+            <tr>
+                <th class="text-center" scope="col">Quiz Name</th>
+                <th class="text-center" scope="col">Total Marks</th>
+                <th class="text-center" scope="col">Time Stamp</th>
+                <th class="text-center" scope="col">Published</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for q in quiz %}
+            <tr>
+                <td class="text-center">{{q.name}}</td>
+                <td class="text-center">{{q.total_marks}}</td>
+                <td class="text-center">{{q.created}}</td>
+                <td class="text-center">{{q.published}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table mt-2">
+                <thead class="thead-light">
+                <tr>
+                    <th class="text-center" scope="col">Quiz Name </th>
+                    <th class="text-center" scope="col">Correct Answers</th>
+                    <th class="text-center" scope="col">Total Marks</th>
+                    <th class="text-center" scope="col">Time Stamp</th>
+                    <th class="text-center" scope="col">View Response</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for details in profile %}
+                <tr>
+                    <td class="text-center">{{details.quiz.name}}</td>
+                    <td class="text-center">{{details.correct_answers}}</td>
+                    <td class="text-center">{{details.quiz.total_marks}}</td>
+                    <td class="text-center">{{details.timestamp}}</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary" href="{% url 'viewresponse' details.quiz.id %}" role="button">View Responses</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+</div>
+{% endblock body %}

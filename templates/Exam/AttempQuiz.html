@@ -1,0 +1,242 @@
+{% extends "base.html" %} {% block title %}OES | Attempt Quiz {% endblock title %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/quiz.css' %}">
+{% endblock css %}
+
+{% block body %}
+
+<div id="quiz-screen">
+  <h1>Quiz on {{quiz_name}}
+    <p id="count"></p>
+  </h1>
+
+  <div class="quiz-container">
+    <div id="quiz"></div>
+  </div>
+  {% csrf_token %}
+  <p id="demo"></p>
+  <button id="previous">Previous Question</button>
+  <button id="next">Next Question</button>
+  <button id="submit">Submit Quiz</button>
+  <div id="results"></div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Click on Full Screen</h5>
+        </div>
+        <div class="modal-body">
+          Enable Full Screen to give test!!
+        </div>
+        <div class="modal-footer">
+          <button onclick="openFullscreen();" data-dismiss="modal">Open Fullscreen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+  
+    $(document).ready(function() { 
+      $('#exampleModal').modal({backdrop: 'static', keyboard: false})  
+    // Functions
+    function buildQuiz() {
+      // variable to store the HTML output
+      const output = [];
+      // for each question...
+      myQuestions.forEach((currentQuestion, questionNumber) => {
+        // variable to store the list of possible answers
+        const answers = [];
+        // and for each available answer...
+        for (letter in currentQuestion.answers) {
+          // ...add an HTML radio button
+          answers.push(
+            `<label>
+                      <input type="radio" name="question${questionNumber}" value="${letter}">
+                      ${letter} :
+                      ${currentQuestion.answers[letter]}
+                    </label>`
+          );
+        }
+
+        // add this question and its answers to the output
+        output.push(
+          `<div class="slide">
+                    <div class="question"> ${currentQuestion.question} </div>
+                    <div class="answers"> ${answers.join("")} </div>
+                  </div>`
+        );
+      });
+
+      // finally combine our output list into one string of HTML and put it on the page
+      quizContainer.innerHTML = output.join("");
+    }
+
+    function showResults() {
+      // gather answer containers from our quiz
+      const answerContainers = quizContainer.querySelectorAll(".answers");
+      // keep track of user's answers
+      let numCorrect = 0;
+      // Dictionary on ques and ans
+      var QnA = {}
+      QnA["Quiz"] = "{{quiz_name}}";
+      // for each question...
+      myQuestions.forEach((currentQuestion, questionNumber) => {
+        // find selected answer
+        const answerContainer = answerContainers[questionNumber];
+        const selector = `input[name=question${questionNumber}]:checked`;
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+        if (typeof userAnswer == "undefined") {
+          QnA[currentQuestion.question] = "null"
+        }
+        else {
+          QnA[currentQuestion.question] = currentQuestion.answers[userAnswer];
+        }
+        // if answer is correct
+        if (userAnswer === currentQuestion.correctAnswer) {
+          // add to the number of correct answers
+          numCorrect+=1;
+          // color the answers green
+          //answerContainers[questionNumber].style.color = "lightgreen";
+        }
+        // if answer is wrong or blank
+        //else {
+        // color the answers red
+        //answerContainers[questionNumber].style.color = "red";
+        //}
+      });
+      QnA["Score"] = numCorrect;
+      senddata(QnA);
+      // show number of correct answers out of total
+      //resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
+    }
+
+    function senddata(QnA) {
+      console.log(QnA);
+      var token = '{{csrf_token}}';
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          if (this.responseText == "Success") {
+            window.location.replace("http://127.0.0.1:8000/");
+          }
+          else {
+            alert("Failed to submit!");
+            window.location.replace("http://127.0.0.1:8000/");
+          }
+        }
+      };
+      xhttp.open("POST", "/submitquiz/", true);
+      xhttp.setRequestHeader('X-CSRFToken', token);
+      xhttp.setRequestHeader('Content-Type', 'application/json');
+      xhttp.send(JSON.stringify(QnA));
+    }
+    
+
+    function showSlide(n) {
+      slides[currentSlide].classList.remove("active-slide");
+      slides[n].classList.add("active-slide");
+      currentSlide = n;
+      if (currentSlide === 0) {
+        previousButton.style.display = "none";
+      } else {
+        previousButton.style.display = "inline-block";
+      }
+      if (currentSlide === slides.length - 1) {
+        nextButton.style.display = "none";
+        submitButton.style.display = "inline-block";
+      } else {
+        nextButton.style.display = "inline-block";
+        submitButton.style.display = "none";
+      }
+    }
+
+    function showNextSlide() {
+      showSlide(currentSlide + 1);
+    }
+
+    function showPreviousSlide() {
+      showSlide(currentSlide - 1);
+    }
+
+    // Variables
+    const quizContainer = document.getElementById("quiz");
+    const resultsContainer = document.getElementById("results");
+    const submitButton = document.getElementById("submit");
+
+    const myQuestions = {{ questions_data| safe}};
+  // Kick things off
+  buildQuiz();
+  
+  // Pagination
+  const previousButton = document.getElementById("previous");
+  const nextButton = document.getElementById("next");
+  const slides = document.querySelectorAll(".slide");
+  let currentSlide = 0;
+
+  // Show the first slide
+  showSlide(currentSlide);
+
+  // Event listeners
+  submitButton.addEventListener("click", showResults);
+  previousButton.addEventListener("click", showPreviousSlide);
+  nextButton.addEventListener("click", showNextSlide);
+
+  const timeSpan = document.getElementById('count');
+  const mins = {{quiz_name.time}};
+  const now = new Date().getTime();
+  const deadline = mins * 60 * 1000 + now;
+  setInterval(() => {
+    var currentTime = new Date().getTime();
+    var distance = deadline - currentTime;
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    timeSpan.innerHTML = 'Timer : Min ' + minutes + ' S : ' + seconds;
+    if (seconds < 0) {
+      document.getElementById("submit").click();
+    }
+  }, 500)
+  var ccount = 0;
+  var acount = 0;
+  document.addEventListener("keydown", function (event) {
+      if (event.altKey) {
+        // document.body.innerHTML = `&nbsp;&nbsp;&nbsp;<b>You have pressed alt+tab </b>`;
+        alert("alt pressed")
+        acount++;
+        console.log(acount);
+      }
+      if (event.ctrlKey) {
+        // document.body.innerHTML = `&nbsp;&nbsp;&nbsp;<b>You have pressed alt+tab </b>`;
+        alert("ctrl pressed")
+        ccount++;
+        console.log(ccount);
+      }
+      if (event.keyCode==27){
+        return false;
+      }
+    });
+    
+  });
+
+  window.onbeforeunload = function() {
+    document.getElementById("submit").click();
+  return "Dude, are you sure you want to leave? Think of the Marks!";
+  }
+
+  var elem = document.getElementById("quiz-screen");
+  function openFullscreen() {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+</script>
+{% endblock body %}

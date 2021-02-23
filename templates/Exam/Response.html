@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}OES | Response{% endblock title %} {% block body %}
+{% include 'Exam/Nav.html'%}
+<div class="container mt-4">
+  <h2>{{quiz}} Responses</h2>
+  <div class="table-responsive">
+    <table class="table mt-2">
+            <thead class="thead-light">
+            <tr>
+                <th class="text-center" scope="col">Question</th>
+                <th class="text-center" scope="col">Your Answer</th>
+                <th class="text-center" scope="col">Response</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for r in response %}
+            <tr>
+                <td>{{r.question}}</td>
+                <td class="text-center">{{r.answer}}</td>
+                <td class="text-center">
+                {% if r.answer.is_correct %}
+                    <i class="fa fa-check fa-lg" aria-hidden="true">Right</i>
+                {% else %}
+                    <i class="fa fa-times fa-lg" aria-hidden="true">Wrong</i>
+                {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a name="" id="" class="btn btn-success" href="{% url 'report' quiz.id %}" role="button">Print</a>
+    <a name="" id="" class="btn btn-info" href="{% url 'send' quiz.id %}" role="button">E-mail</a>
+</div>
+{% endblock body %}
