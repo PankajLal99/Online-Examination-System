@@ -6,9 +6,10 @@
 
 {% block body %}
 
-<div id="quiz-screen">
+<div id="quiz-screen" style="visibility: hidden;background-color: white;">
   <h1>Quiz on {{quiz_name}}
     <p id="count"></p>
+    <img src="{%url 'video' %}" style="width: 70px;height: 70px;">  
   </h1>
 
   <div class="quiz-container">
@@ -42,7 +43,7 @@
 <script>
   
     $(document).ready(function() { 
-      $('#exampleModal').modal({backdrop: 'static', keyboard: false})  
+      $('#exampleModal').modal({backdrop: 'static', keyboard: false});
     // Functions
     function buildQuiz() {
       // variable to store the HTML output
@@ -204,32 +205,37 @@
   var ccount = 0;
   var acount = 0;
   document.addEventListener("keydown", function (event) {
+    var e = document.getElementById("quiz-screen");
       if (event.altKey) {
         // document.body.innerHTML = `&nbsp;&nbsp;&nbsp;<b>You have pressed alt+tab </b>`;
         alert("alt pressed")
         acount++;
         console.log(acount);
+        e.style.visibility="hidden";
+        $('#exampleModal').modal({backdrop: 'static', keyboard: false});
       }
       if (event.ctrlKey) {
         // document.body.innerHTML = `&nbsp;&nbsp;&nbsp;<b>You have pressed alt+tab </b>`;
         alert("ctrl pressed")
         ccount++;
         console.log(ccount);
+        e.style.visibility="hidden";
+        $('#exampleModal').modal({backdrop: 'static', keyboard: false});
+      }
+      if (ccount>3 && acount>3){
+        var e = document.getElementById("quiz-screen");
+        e.style.visibility="hidden";
+        document.getElementById("submit").click();
       }
       if (event.keyCode==27){
         return false;
       }
     });
-    
   });
-
-  window.onbeforeunload = function() {
-    document.getElementById("submit").click();
-  return "Dude, are you sure you want to leave? Think of the Marks!";
-  }
 
   var elem = document.getElementById("quiz-screen");
   function openFullscreen() {
+    elem.style.visibility="visible";
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) { /* Safari */

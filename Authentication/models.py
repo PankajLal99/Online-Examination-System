@@ -8,6 +8,9 @@ from django.dispatch import receiver
 branches=[
     ("CSE","CSE"),
     ("ME","ME"),
+    ("ECE","ECE"),
+    ("EX","EX"),
+    ("CE","CE"),
 ]
 
 sem=[
@@ -15,7 +18,12 @@ sem=[
     ("II","II"),
     ("III","III"),
     ("IV","IV"),
+    ("V","V"),
+    ("VI","VI"),
+    ("VII","VII"),
+    ("VIII","VIII"),
 ]
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     Sem=models.CharField(max_length=20,null=True,choices=sem)
